@@ -82,47 +82,27 @@ elif section == "Top Districts & Pincodes":
 
 
 # Insurance Trends
-elif section == "Insurance Trends":
+    elif section == "Insurance Trends":
     st.header("📈 Quarterly Insurance Amount Trends")
 
-    # Quarter filter dropdown
-    selected_year = st.selectbox("Select Year", sorted(df_ins["Year"].unique()))
-    selected_quarter = st.selectbox("Select Quarter", sorted(df_ins["Quarter"].unique()))
+    # 🔹 Load data first
+    query = "SELECT Year, Quarter, SUM(Insurance_amount) AS total_insurance_amount FROM Aggregated_insurance GROUP BY Year, Quarter ORDER BY Year, Quarter;"
+    df_ins = pd.read_sql_query(query, conn)
 
-    # Filter the data
-    query = f"""
-        SELECT Year, Quarter, SUM(Insurance_amount) AS total_insurance_amount
-        FROM Aggregated_insurance
-        WHERE Year = {selected_year} AND Quarter = {selected_quarter}
-        GROUP BY Year, Quarter
-        ORDER BY Year, Quarter;
-    """
-    df_filtered = pd.read_sql_query(query, conn)
-
-    # Show filtered line chart
-    df_filtered["Year_Quarter"] = df_filtered["Year"].astype(str) + " Q" + df_filtered["Quarter"].astype(str)
-
-    fig, ax = plt.subplots(figsize=(10,5))
-    sns.barplot(data=df_filtered, x="Year_Quarter", y="total_insurance_amount", palette="coolwarm", ax=ax)
-    plt.title(f"Insurance Transactions: {selected_year} Q{selected_quarter}")
-    st.pyplot(fig)
-
-
-    # Create Year_Quarter column for better x-axis labels
+    # 🔹 Now use df_ins safely
     df_ins["Year_Quarter"] = df_ins["Year"].astype(str) + " Q" + df_ins["Quarter"].astype(str)
 
-    fig, ax = plt.subplots(figsize=(14,6))
-    sns.lineplot(data=df_ins, x="Year_Quarter", y="total_insurance_amount", marker="o", ax=ax, color='teal')
+    # 🔹 Line plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+    sns.lineplot(data=df_ins, x="Year_Quarter", y="total_insurance_amount", marker="o", ax=ax)
     plt.xticks(rotation=45)
     plt.title("Quarter-wise Insurance Transactions Over Years")
-    plt.ylabel("Total Insurance Amount")
-    plt.xlabel("Year & Quarter")
     st.pyplot(fig)
 
+    # 🔹 Add insights
     st.markdown("### 🔍 Insights")
-    st.write("- Steady growth in digital insurance adoption since 2021.")
-    st.write("- Urban regions show strong trust in digital financial services.")
-    st.write("- Peaks in specific quarters indicate seasonal campaigns or awareness drives.")
+    st.write("- Insurance adoption on PhonePe is growing steadily over quarters.")
+    st.write("- Spikes in some quarters may indicate new insurance product launches or targeted campaigns.")
 
 
 # Customer Segmentation
