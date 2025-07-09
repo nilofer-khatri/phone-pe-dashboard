@@ -13,7 +13,14 @@ conn = sqlite3.connect("phonepe.db")
 
 # Sidebar
 st.sidebar.header("Navigation")
-section = st.sidebar.radio("Go to:", ["Overview", "State Analysis", "Yearly Trends", "Top Districts & Pincodes", "Insurance Trends"])
+section = st.sidebar.radio("Go to:", [
+    "Overview", 
+    "State Analysis", 
+    "Yearly Trends", 
+    "Top Districts & Pincodes", 
+    "Insurance Trends",
+    "Customer Segmentation"  # ✅ NEW SECTION
+])
 
 # Overview
 if section == "Overview":
