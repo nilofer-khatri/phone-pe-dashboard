@@ -13,14 +13,8 @@ conn = sqlite3.connect("phonepe.db")
 
 # Sidebar
 st.sidebar.header("Navigation")
-section = st.sidebar.radio("Go to:", [
-    "Overview", 
-    "State Analysis", 
-    "Yearly Trends", 
-    "Top Districts & Pincodes", 
-    "Insurance Trends",
-    "Customer Segmentation"  # ✅ NEW SECTION
-])
+section = st.sidebar.radio("Go to:", ["Overview", "State Analysis", "Yearly Trends", "Top Districts & Pincodes", "Insurance Trends", "Customer Segmentation"])
+
 
 # Overview
 if section == "Overview":
@@ -31,6 +25,11 @@ if section == "Overview":
     - 📌 **Goal**: Analyze digital payment patterns across India from 2018 to 2024
     - 📍 Focused on: Transaction Volume, User Growth, Insurance Adoption, Geographic Trends
     """)
+
+    st.markdown("### 🔍 Insights")
+    st.write("- Digital payments in India have grown rapidly with UPI platforms like PhonePe.")
+    st.write("- This dashboard helps explore geographic and temporal patterns of transactions and insurance.")
+
 
 # State-wise Transaction Amounts
 elif section == "State Analysis":
@@ -44,6 +43,11 @@ elif section == "State Analysis":
     plt.title("Top 10 States by Transaction Amount")
     st.pyplot(fig)
 
+    st.markdown("### 🔍 Insights")
+    st.write("- Maharashtra, Karnataka, and Telangana lead in digital transactions.")
+    st.write("- These states reflect better digital adoption and payment infrastructure.")
+
+
 # Yearly Transaction Trends
 elif section == "Yearly Trends":
     st.header("📅 Yearly Transaction Amount Trends")
@@ -54,6 +58,11 @@ elif section == "Yearly Trends":
     sns.lineplot(data=df_year, x="Year", y="total_amount", marker="o", ax=ax)
     plt.title("Year-wise Total Transaction Amount")
     st.pyplot(fig)
+
+    st.markdown("### 🔍 Insights")
+    st.write("- Transaction volume grew significantly from 2018 to 2024.")
+    st.write("- A visible spike post-2020 shows increased digital usage during and after the pandemic.")
+
 
 # Top Districts and Pincodes
 elif section == "Top Districts & Pincodes":
@@ -66,6 +75,11 @@ elif section == "Top Districts & Pincodes":
     query2 = "SELECT Pincode, SUM(RegisteredUsers) AS total_users FROM Top_user GROUP BY Pincode ORDER BY total_users DESC LIMIT 10;"
     df_pin = pd.read_sql_query(query2, conn)
     st.dataframe(df_pin)
+
+    st.markdown("### 🔍 Insights")
+    st.write("- Districts from metro areas like Mumbai and Bengaluru show the highest digital activity.")
+    st.write("- Pincodes with more registered users point to urban centers with higher smartphone penetration.")
+
 
 # Insurance Trends
 elif section == "Insurance Trends":
@@ -105,31 +119,48 @@ elif section == "Insurance Trends":
     plt.xlabel("Year & Quarter")
     st.pyplot(fig)
 
+    st.markdown("### 🔍 Insights")
+    st.write("- Steady growth in digital insurance adoption since 2021.")
+    st.write("- Urban regions show strong trust in digital financial services.")
+    st.write("- Peaks in specific quarters indicate seasonal campaigns or awareness drives.")
+
+
 # Customer Segmentation
 elif section == "Customer Segmentation":
-    st.header("🧑‍🤝‍🧑 Customer Segmentation by State and Year")
+    st.header("👥 Customer Segmentation by State and Year")
 
-    # Dropdowns
-    state_options = pd.read_sql_query("SELECT DISTINCT State FROM Aggregated_transaction ORDER BY State;", conn)
-    year_options = pd.read_sql_query("SELECT DISTINCT Year FROM Aggregated_transaction ORDER BY Year;", conn)
+    # Filters
+    state_options = pd.read_sql_query("SELECT DISTINCT State FROM Top_user", conn)
+    year_options = pd.read_sql_query("SELECT DISTINCT Year FROM Top_user", conn)
 
-    selected_state = st.selectbox("Select State", state_options["State"])
-    selected_year = st.selectbox("Select Year", year_options["Year"])
+    selected_state = st.selectbox("Select State", sorted(state_options["State"].unique()))
+    selected_year = st.selectbox("Select Year", sorted(year_options["Year"].unique()))
 
-    # Filtered Query
+    # Query filtered data
     query = f'''
-    SELECT Transaction_type, SUM(Transaction_amount) as total_amount
-    FROM Aggregated_transaction
-    WHERE State = '{selected_state}' AND Year = {selected_year}
-    GROUP BY Transaction_type
+        SELECT State, Year, Pincode, RegisteredUsers, AppOpens
+        FROM Top_user
+        WHERE State = '{selected_state}' AND Year = {selected_year}
+        ORDER BY RegisteredUsers DESC
+        LIMIT 10;
     '''
-    df_filtered = pd.read_sql_query(query, conn)
+    df_segment = pd.read_sql_query(query, conn)
 
-    # Bar Chart
-    fig, ax = plt.subplots(figsize=(10,5))
-    sns.barplot(data=df_filtered, x="Transaction_type", y="total_amount", palette="coolwarm", ax=ax)
-    plt.title(f"Transaction Type Distribution in {selected_state} ({selected_year})")
+    # Display data
+    st.dataframe(df_segment)
+
+    # Plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+    sns.barplot(data=df_segment, x="Pincode", y="RegisteredUsers", palette="mako", ax=ax)
+    plt.xticks(rotation=45)
+    plt.title(f"Top 10 Pincodes by Registered Users in {selected_state} ({selected_year})")
     st.pyplot(fig)
+
+    # Insights
+    st.markdown("### 🔍 Insights")
+    st.write(f"- In {selected_state}, users in certain pincodes are highly active with many registrations.")
+    st.write("- Regions with high registrations can be targeted for new product launches or awareness campaigns.")
+
 
 
    
