@@ -13,7 +13,7 @@ conn = sqlite3.connect("phonepe.db")
 
 # Sidebar
 st.sidebar.header("Navigation")
-section = st.sidebar.radio("Go to:", ["Overview", "State Analysis", "Yearly Trends", "Top Districts & Pincodes", "Insurance Trends", "Customer Segmentation"])
+section = st.sidebar.radio("Go to:", ["Overview", "State Analysis", "Yearly Trends", "Top Districts & Pincodes", "Insurance Trends", "Customer Segmentation", "Conclusion"])
 
 
 # Overview
@@ -141,6 +141,27 @@ elif section == "Customer Segmentation":
     st.write(f"- In {selected_state}, users in certain pincodes are highly active with many registrations.")
     st.write("- Regions with high registrations can be targeted for new product launches or awareness campaigns.")
 
+#Conclusion
+
+elif section == "Conclusion":
+    st.header("📌 Final Conclusion & Recommendations")
+
+    st.markdown("""
+    ### Summary of Insights:
+    - **States like Maharashtra, Karnataka, and Telangana** lead in both transaction volume and user base.
+    - **Digital adoption is growing consistently** year-on-year from 2018 to 2024.
+    - **Insurance product usage** is increasing, especially in urban states.
+    - **Top-performing districts and pincodes** show concentrated usage—ideal for targeted marketing.
+    - **Customer segmentation by state/year** reveals regional preferences and app engagement patterns.
+
+    ### Recommendations:
+    - 🧠 Invest more in high-performing states with personalized campaigns.
+    - 📲 Promote insurance services in growing states via in-app nudges.
+    - 📍 Launch new features in regions with high app openings.
+    - 📊 Use this data model to enhance fraud detection and user targeting.
+    """)
+
+    st.success("Thank you for exploring the PhonePe Transaction Insights Dashboard! 🚀")
 
 
    
