@@ -82,7 +82,7 @@ elif section == "Top Districts & Pincodes":
 
 
 # Insurance Trends
-    elif section == "Insurance Trends":
+elif section == "Insurance Trends":
     st.header("📈 Quarterly Insurance Amount Trends")
 
     # 🔹 Load data first
