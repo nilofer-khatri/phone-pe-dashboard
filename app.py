@@ -68,18 +68,31 @@ elif section == "Top Districts & Pincodes":
     st.dataframe(df_pin)
 
 # Insurance Trends
-# Insurance Trends
 elif section == "Insurance Trends":
     st.header("📈 Quarterly Insurance Amount Trends")
-    
-    query = '''
-    SELECT Year, Quarter, SUM(Insurance_amount) AS total_insurance_amount
-    FROM Aggregated_insurance
-    GROUP BY Year, Quarter
-    ORDER BY Year, Quarter;
-    '''
-    
-    df_ins = pd.read_sql_query(query, conn)
+
+    # Quarter filter dropdown
+    selected_year = st.selectbox("Select Year", sorted(df_ins["Year"].unique()))
+    selected_quarter = st.selectbox("Select Quarter", sorted(df_ins["Quarter"].unique()))
+
+    # Filter the data
+    query = f"""
+        SELECT Year, Quarter, SUM(Insurance_amount) AS total_insurance_amount
+        FROM Aggregated_insurance
+        WHERE Year = {selected_year} AND Quarter = {selected_quarter}
+        GROUP BY Year, Quarter
+        ORDER BY Year, Quarter;
+    """
+    df_filtered = pd.read_sql_query(query, conn)
+
+    # Show filtered line chart
+    df_filtered["Year_Quarter"] = df_filtered["Year"].astype(str) + " Q" + df_filtered["Quarter"].astype(str)
+
+    fig, ax = plt.subplots(figsize=(10,5))
+    sns.barplot(data=df_filtered, x="Year_Quarter", y="total_insurance_amount", palette="coolwarm", ax=ax)
+    plt.title(f"Insurance Transactions: {selected_year} Q{selected_quarter}")
+    st.pyplot(fig)
+
 
     # Create Year_Quarter column for better x-axis labels
     df_ins["Year_Quarter"] = df_ins["Year"].astype(str) + " Q" + df_ins["Quarter"].astype(str)
