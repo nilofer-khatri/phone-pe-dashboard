@@ -61,14 +61,28 @@ elif section == "Top Districts & Pincodes":
     st.dataframe(df_pin)
 
 # Insurance Trends
+# Insurance Trends
 elif section == "Insurance Trends":
     st.header("📈 Quarterly Insurance Amount Trends")
-    query = "SELECT Year, Quarter, SUM(Insurance_amount) AS total_insurance_amount FROM Aggregated_insurance GROUP BY Year, Quarter ORDER BY Year, Quarter;"
+    
+    query = '''
+    SELECT Year, Quarter, SUM(Insurance_amount) AS total_insurance_amount
+    FROM Aggregated_insurance
+    GROUP BY Year, Quarter
+    ORDER BY Year, Quarter;
+    '''
+    
     df_ins = pd.read_sql_query(query, conn)
 
-    fig, ax = plt.subplots(figsize=(12,6))
-    sns.lineplot(data=df_ins, x="Quarter", y="total_insurance_amount", hue="Year", marker="o", ax=ax)
+    # Create Year_Quarter column for better x-axis labels
+    df_ins["Year_Quarter"] = df_ins["Year"].astype(str) + " Q" + df_ins["Quarter"].astype(str)
+
+    fig, ax = plt.subplots(figsize=(14,6))
+    sns.lineplot(data=df_ins, x="Year_Quarter", y="total_insurance_amount", marker="o", ax=ax, color='teal')
+    plt.xticks(rotation=45)
     plt.title("Quarter-wise Insurance Transactions Over Years")
+    plt.ylabel("Total Insurance Amount")
+    plt.xlabel("Year & Quarter")
     st.pyplot(fig)
 
 conn.close()
