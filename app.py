@@ -85,4 +85,31 @@ elif section == "Insurance Trends":
     plt.xlabel("Year & Quarter")
     st.pyplot(fig)
 
+# Customer Segmentation
+elif section == "Customer Segmentation":
+    st.header("🧑‍🤝‍🧑 Customer Segmentation by State and Year")
+
+    # Dropdowns
+    state_options = pd.read_sql_query("SELECT DISTINCT State FROM Aggregated_transaction ORDER BY State;", conn)
+    year_options = pd.read_sql_query("SELECT DISTINCT Year FROM Aggregated_transaction ORDER BY Year;", conn)
+
+    selected_state = st.selectbox("Select State", state_options["State"])
+    selected_year = st.selectbox("Select Year", year_options["Year"])
+
+    # Filtered Query
+    query = f'''
+    SELECT Transaction_type, SUM(Transaction_amount) as total_amount
+    FROM Aggregated_transaction
+    WHERE State = '{selected_state}' AND Year = {selected_year}
+    GROUP BY Transaction_type
+    '''
+    df_filtered = pd.read_sql_query(query, conn)
+
+    # Bar Chart
+    fig, ax = plt.subplots(figsize=(10,5))
+    sns.barplot(data=df_filtered, x="Transaction_type", y="total_amount", palette="coolwarm", ax=ax)
+    plt.title(f"Transaction Type Distribution in {selected_state} ({selected_year})")
+    st.pyplot(fig)
+
+
 conn.close()
