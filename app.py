@@ -119,4 +119,7 @@ elif section == "Customer Segmentation":
     st.pyplot(fig)
 
 
+   
+
+
 conn.close()
